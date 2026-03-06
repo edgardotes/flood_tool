@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swiss Camping Flood Hazard Monitor</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --border: #d9e0ea;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --green: #2e7d32;
+      --yellow: #b58900;
+      --orange: #d97706;
+      --red: #c62828;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    header h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.2rem;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 0;
+      height: calc(100vh - 76px);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+    }
+
+    aside {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .alert-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: white;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .alert-green { background: var(--green); }
+    .alert-yellow { background: var(--yellow); }
+    .alert-orange { background: var(--orange); }
+    .alert-red { background: var(--red); }
+
+    .detail-block {
+      margin-bottom: 14px;
+    }
+
+    .detail-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .detail-value {
+      font-size: 0.98rem;
+      line-height: 1.4;
+    }
+
+    .hazard-image {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 10px;
+      background: #eef2f7;
+    }
+
+    .placeholder {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      #map {
+        height: 55vh;
+      }
+
+      aside {
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Swiss Camping Flood Hazard Monitor</h1>
+    <p>Static mockup for campsite-focused hazard scenarios in Switzerland</p>
+  </header>
+
+  <main class="layout">
+    <div id="map"></div>
+
+    <aside>
+      <h2 class="panel-title">Site information</h2>
+      <div id="panel" class="placeholder">
+        Click a campsite marker on the map to view its current mock alert status and hazard scenario.
+      </div>
+    </aside>
+  </main>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    const map = L.map('map').setView([46.8182, 8.2275], 8);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    function badgeClass(level) {
+      return `alert-badge alert-${level}`;
+    }
+
+    function renderPanel(site, updatedUtc, source) {
+      const panel = document.getElementById('panel');
+      panel.innerHTML = `
+        <div class="${badgeClass(site.alert_level)}">${site.alert_level}</div>
+
+        <div class="detail-block">
+          <div class="detail-label">Camping site</div>
+          <div class="detail-value"><strong>${site.name}</strong></div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Canton</div>
+          <div class="detail-value">${site.canton}</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Scenario</div>
+          <div class="detail-value">${site.scenario}</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Message</div>
+          <div class="detail-value">${site.message}</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Coordinates</div>
+          <div class="detail-value">${site.lat.toFixed(3)}, ${site.lon.toFixed(3)}</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Last update</div>
+          <div class="detail-value">${updatedUtc}</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Source</div>
+          <div class="detail-value">${source}</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Hazard map preview</div>
+          <img class="hazard-image" src="${site.hazard_image}" alt="Hazard map for ${site.name}">
+        </div>
+      `;
+    }
+
+    function markerColor(level) {
+      switch (level) {
+        case 'green': return '#2e7d32';
+        case 'yellow': return '#b58900';
+        case 'orange': return '#d97706';
+        case 'red': return '#c62828';
+        default: return '#2563eb';
+      }
+    }
+
+    function createCircleMarker(site, updatedUtc, source) {
+      const marker = L.circleMarker([site.lat, site.lon], {
+        radius: 9,
+        color: markerColor(site.alert_level),
+        fillColor: markerColor(site.alert_level),
+        fillOpacity: 0.9,
+        weight: 2
+      });
+
+      marker.bindPopup(`
+        <strong>${site.name}</strong><br>
+        Canton: ${site.canton}<br>
+        Alert: ${site.alert_level.toUpperCase()}<br>
+        Scenario: ${site.scenario}
+      `);
+
+      marker.on('click', () => {
+        renderPanel(site, updatedUtc, source);
+      });
+
+      return marker;
+    }
+
+    async function init() {
+      const response = await fetch('./api/latest.json');
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} while loading ./api/latest.json`);
+      }
+
+      const data = await response.json();
+
+      const bounds = [];
+
+      data.sites.forEach(site => {
+        const marker = createCircleMarker(site, data.updated_utc, data.source);
+        marker.addTo(map);
+        bounds.push([site.lat, site.lon]);
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30] });
+        renderPanel(data.sites[0], data.updated_utc, data.source);
+      }
+    }
+
+    init().catch(err => {
+      document.getElementById('panel').innerHTML = `
+        <div class="detail-value">
+          Failed to load mock data.<br>
+          <code>${err.message}</code>
+        </div>
+      `;
+      console.error(err);
+    });
+  </script>
+</body>
+</html>

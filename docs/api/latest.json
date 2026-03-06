@@ -1,0 +1,39 @@
+{
+  "updated_utc": "2026-03-06T12:00:00Z",
+  "source": "Static mockup",
+  "sites": [
+    {
+      "id": "interlaken",
+      "name": "Camping Manor Farm",
+      "canton": "BE",
+      "lat": 46.705,
+      "lon": 7.889,
+      "alert_level": "green",
+      "scenario": "No flooding expected",
+      "message": "Conditions currently normal.",
+      "hazard_image": "https://placehold.co/700x420?text=Interlaken+Scenario"
+    },
+    {
+      "id": "disentis",
+      "name": "TCS Camping Disentis",
+      "canton": "GR",
+      "lat": 46.703,
+      "lon": 8.850,
+      "alert_level": "orange",
+      "scenario": "Moderate flooding of low-lying areas",
+      "message": "Camping access and nearby low points may be affected.",
+      "hazard_image": "https://placehold.co/700x420?text=Disentis+Scenario"
+    },
+    {
+      "id": "sion",
+      "name": "Camping Sion",
+      "canton": "VS",
+      "lat": 46.227,
+      "lon": 7.359,
+      "alert_level": "red",
+      "scenario": "Severe flooding scenario",
+      "message": "Significant inundation possible within the campsite footprint.",
+      "hazard_image": "https://placehold.co/700x420?text=Sion+Scenario"
+    }
+  ]
+}
