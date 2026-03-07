@@ -1,0 +1,29 @@
+{
+  "site_id": "manor_farm",
+  "scenarios": {
+    "green": {
+      "label": "Green",
+      "alert_level": "green",
+      "message": "No flooding expected.",
+      "image": "./scenarios/manor_farm/green.png"
+    },
+    "yellow": {
+      "label": "Yellow",
+      "alert_level": "yellow",
+      "message": "Minor flooding possible in low-lying areas.",
+      "image": "./scenarios/manor_farm/yellow.png"
+    },
+    "orange": {
+      "label": "Orange",
+      "alert_level": "orange",
+      "message": "Moderate flooding may affect campsite access.",
+      "image": "./scenarios/manor_farm/orange.png"
+    },
+    "red": {
+      "label": "Red",
+      "alert_level": "red",
+      "message": "Severe flooding may affect the campsite footprint.",
+      "image": "./scenarios/manor_farm/red.png"
+    }
+  }
+}

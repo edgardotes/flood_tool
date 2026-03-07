@@ -1,0 +1,31 @@
+{
+  "sites": [
+    {
+      "id": "manor_farm",
+      "name": "Camping Manor Farm",
+      "canton": "BE",
+      "lat": 46.705,
+      "lon": 7.889,
+      "default_scenario": "orange",
+      "default_alert_level": "orange"
+    },
+    {
+      "id": "disentis",
+      "name": "TCS Camping Disentis",
+      "canton": "GR",
+      "lat": 46.703,
+      "lon": 8.850,
+      "default_scenario": "yellow",
+      "default_alert_level": "yellow"
+    },
+    {
+      "id": "sion",
+      "name": "Camping Sion",
+      "canton": "VS",
+      "lat": 46.227,
+      "lon": 7.359,
+      "default_scenario": "red",
+      "default_alert_level": "red"
+    }
+  ]
+}
