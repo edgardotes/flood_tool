@@ -17,7 +17,7 @@
 <body>
   <header class="site-header">
     <h1>Swiss Camping Flood Hazard Monitor</h1>
-    <p>Phase 2 — Scenario browser for precomputed campsite flood maps</p>
+    <p>Phase 2.5 — Scenario browser with campsite selector</p>
   </header>
 
   <main class="layout">
@@ -27,8 +27,16 @@
 
     <aside class="side-panel">
       <h2 class="panel-title">Site information</h2>
+
+      <div class="site-selector-block">
+        <label for="site-select" class="detail-label">Select campsite</label>
+        <select id="site-select" class="site-select">
+          <option value="">Loading sites...</option>
+        </select>
+      </div>
+
       <div id="panel" class="placeholder">
-        Click a campsite marker on the map to load its precomputed flood scenarios.
+        Click a campsite marker on the map or choose one from the dropdown.
       </div>
     </aside>
   </main>

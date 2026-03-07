@@ -44,6 +44,20 @@ body {
   font-size: 0.95rem;
 }
 
+.site-selector-block {
+  margin-bottom: 16px;
+}
+
+.site-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
 .layout {
   display: grid;
   grid-template-columns: 2fr 1fr;

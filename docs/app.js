@@ -17,6 +17,7 @@ let sitesData = [];
 let currentSite = null;
 let currentScenarioKey = null;
 let currentScenarioConfig = null;
+const markersBySiteId = {};
 
 function markerColor(level) {
   switch (level) {
@@ -50,6 +51,54 @@ function escapeHtml(str) {
   }[ch]));
 }
 
+function renderLegend() {
+  return `
+    <div class="legend-box">
+      <div class="detail-label">Legend</div>
+      <div class="legend-row"><span class="legend-dot legend-green"></span> Green — No flooding expected</div>
+      <div class="legend-row"><span class="legend-dot legend-yellow"></span> Yellow — Minor flooding</div>
+      <div class="legend-row"><span class="legend-dot legend-orange"></span> Orange — Moderate flooding</div>
+      <div class="legend-row"><span class="legend-dot legend-red"></span> Red — Severe flooding</div>
+    </div>
+  `;
+}
+
+function populateSiteDropdown(sites) {
+  const select = document.getElementById('site-select');
+  select.innerHTML = '';
+
+  sites.forEach(site => {
+    const option = document.createElement('option');
+    option.value = site.id;
+    option.textContent = `${site.name} (${site.canton})`;
+    select.appendChild(option);
+  });
+
+  select.addEventListener('change', async (event) => {
+    const selectedSiteId = event.target.value;
+    const selectedSite = sitesData.find(site => site.id === selectedSiteId);
+    if (!selectedSite) return;
+
+    await loadSite(selectedSite, { recenterMap: true, openPopup: true });
+  });
+}
+
+function syncDropdown(siteId) {
+  const select = document.getElementById('site-select');
+  if (select && select.value !== siteId) {
+    select.value = siteId;
+  }
+}
+
+function focusSiteOnMap(site, openPopup = false) {
+  map.setView([site.lat, site.lon], 10, { animate: true });
+
+  const marker = markersBySiteId[site.id];
+  if (marker && openPopup) {
+    marker.openPopup();
+  }
+}
+
 function createMarker(site) {
   const defaultLevel = site.default_alert_level || 'green';
 
@@ -68,22 +117,12 @@ function createMarker(site) {
   `);
 
   marker.on('click', async () => {
-    await loadSite(site);
+    await loadSite(site, { recenterMap: false, openPopup: false });
+    syncDropdown(site.id);
   });
 
+  markersBySiteId[site.id] = marker;
   return marker;
-}
-
-function renderLegend() {
-  return `
-    <div class="legend-box">
-      <div class="detail-label">Legend</div>
-      <div class="legend-row"><span class="legend-dot legend-green"></span> Green — No flooding expected</div>
-      <div class="legend-row"><span class="legend-dot legend-yellow"></span> Yellow — Minor flooding</div>
-      <div class="legend-row"><span class="legend-dot legend-orange"></span> Orange — Moderate flooding</div>
-      <div class="legend-row"><span class="legend-dot legend-red"></span> Red — Severe flooding</div>
-    </div>
-  `;
 }
 
 function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
@@ -175,7 +214,12 @@ function updateScenario(scenarioKey) {
   );
 }
 
-async function loadSite(site) {
+async function loadSite(site, options = {}) {
+  const {
+    recenterMap = false,
+    openPopup = false
+  } = options;
+
   const scenarioPath = `./scenarios/${site.id}/scenarios.json`;
   const scenarioData = await fetchJson(scenarioPath);
 
@@ -190,6 +234,11 @@ async function loadSite(site) {
     : scenarioKeys[0];
 
   updateScenario(initialScenarioKey);
+  syncDropdown(site.id);
+
+  if (recenterMap) {
+    focusSiteOnMap(site, openPopup);
+  }
 }
 
 async function init() {
@@ -204,6 +253,8 @@ async function init() {
       return;
     }
 
+    populateSiteDropdown(sitesData);
+
     const bounds = [];
 
     sitesData.forEach(site => {
@@ -216,7 +267,7 @@ async function init() {
       map.fitBounds(bounds, { padding: [30, 30] });
     }
 
-    await loadSite(sitesData[0]);
+    await loadSite(sitesData[0], { recenterMap: false, openPopup: false });
   } catch (error) {
     panel.innerHTML = `
       <div class="detail-value">
