@@ -1,0 +1,29 @@
+{
+  "site_id": "interlaken",
+  "scenarios": {
+    "green": {
+      "label": "Green",
+      "alert_level": "green",
+      "message": "No flooding expected.",
+      "image": "./scenarios/interlaken/green.png"
+    },
+    "yellow": {
+      "label": "Yellow",
+      "alert_level": "yellow",
+      "message": "Water may pond in low-lying sectors near the campsite.",
+      "image": "./scenarios/interlaken/yellow.png"
+    },
+    "orange": {
+      "label": "Orange",
+      "alert_level": "orange",
+      "message": "Moderate flooding may affect internal access roads.",
+      "image": "./scenarios/interlaken/orange.png"
+    },
+    "red": {
+      "label": "Red",
+      "alert_level": "red",
+      "message": "Severe flooding may affect important parts of the campsite.",
+      "image": "./scenarios/interlaken/red.png"
+    }
+  }
+}

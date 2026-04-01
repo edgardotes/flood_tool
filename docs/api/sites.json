@@ -1,29 +1,38 @@
 {
   "sites": [
     {
-      "id": "manor_farm",
-      "name": "Camping Manor Farm",
-      "canton": "BE",
-      "lat": 46.705,
-      "lon": 7.889,
+      "id": "morges",
+      "name": "TCS Camping Morges",
+      "canton": "VD",
+      "lat": 46.503611036,
+      "lon": 6.489430283,
       "default_scenario": "orange",
       "default_alert_level": "orange"
     },
     {
-      "id": "disentis",
-      "name": "TCS Camping Disentis",
-      "canton": "GR",
-      "lat": 46.703,
-      "lon": 8.850,
+      "id": "gordevio",
+      "name": "TCS Camping Gordevio",
+      "canton": "TI",
+      "lat": 46.22120631,
+      "lon": 8.742168713,
       "default_scenario": "yellow",
       "default_alert_level": "yellow"
     },
     {
-      "id": "sion",
-      "name": "Camping Sion",
-      "canton": "VS",
-      "lat": 46.227,
-      "lon": 7.359,
+      "id": "interlaken",
+      "name": "TCS Camping Interlaken",
+      "canton": "BE",
+      "lat": 46.692649776,
+      "lon": 7.869200013,
+      "default_scenario": "red",
+      "default_alert_level": "red"
+    },
+    {
+      "id": "zell",
+      "name": "Zell",
+      "canton": "ZH",
+      "lat": 47.447903436,
+      "lon": 8.823286228,
       "default_scenario": "red",
       "default_alert_level": "red"
     }

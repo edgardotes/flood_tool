@@ -13,11 +13,29 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+let latestStatusBySiteId = {};
 let sitesData = [];
 let currentSite = null;
 let currentScenarioKey = null;
 let currentScenarioConfig = null;
 const markersBySiteId = {};
+
+function buildLatestStatusIndex(latestJson) {
+  latestStatusBySiteId = {};
+
+  if (!latestJson) return;
+
+  if (Array.isArray(latestJson.sites)) {
+    latestJson.sites.forEach(siteStatus => {
+      latestStatusBySiteId[siteStatus.id] = siteStatus;
+    });
+    return;
+  }
+
+  if (latestJson.site && latestJson.site.id) {
+    latestStatusBySiteId[latestJson.site.id] = latestJson.site;
+  }
+}
 
 function markerColor(level) {
   switch (level) {
@@ -100,12 +118,13 @@ function focusSiteOnMap(site, openPopup = false) {
 }
 
 function createMarker(site) {
-  const defaultLevel = site.default_alert_level || 'green';
+  const latestStatus = latestStatusBySiteId[site.id];
+  const markerLevel = latestStatus?.alert_level || site.default_alert_level || 'green';
 
   const marker = L.circleMarker([site.lat, site.lon], {
     radius: 9,
-    color: markerColor(defaultLevel),
-    fillColor: markerColor(defaultLevel),
+    color: markerColor(markerLevel),
+    fillColor: markerColor(markerLevel),
     fillOpacity: 0.9,
     weight: 2
   });
@@ -113,6 +132,7 @@ function createMarker(site) {
   marker.bindPopup(`
     <strong>${escapeHtml(site.name)}</strong><br>
     Canton: ${escapeHtml(site.canton)}<br>
+    Alert: ${escapeHtml(markerLevel.toUpperCase())}<br>
     Default scenario: ${escapeHtml(site.default_scenario)}
   `);
 
@@ -126,6 +146,7 @@ function createMarker(site) {
 }
 
 function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
+  const latestStatus = latestStatusBySiteId[site.id];
   const panel = document.getElementById('panel');
 
   const buttonsHtml = availableScenarioKeys.map(key => {
@@ -143,7 +164,9 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
   }).join('');
 
   panel.innerHTML = `
-    <div class="${badgeClass(scenarioConfig.alert_level)}">${escapeHtml(scenarioConfig.alert_level)}</div>
+   <div class="${badgeClass((latestStatus?.alert_level) || scenarioConfig.alert_level)}">
+     ${escapeHtml((latestStatus?.alert_level) || scenarioConfig.alert_level)}
+   </div>
 
     <div class="detail-block">
       <div class="detail-label">Camping site</div>
@@ -169,6 +192,26 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
       <div class="detail-label">Message</div>
       <div class="detail-value">${escapeHtml(scenarioConfig.message)}</div>
     </div>
+
+    ${latestStatus ? `
+      <div class="detail-block">
+        <div class="detail-label">Operational status</div>
+        <div class="detail-value">${escapeHtml(latestStatus.message || "No message available.")}</div>
+      </div>
+
+      <div class="detail-block">
+        <div class="detail-label">Selected scenario from forecast</div>
+        <div class="detail-value">${escapeHtml(latestStatus.selected_scenario)}</div>
+      </div>
+
+      <div class="detail-block">
+        <div class="detail-label">Decision metrics</div>
+        <div class="detail-value">
+          domain_p90_6h: ${latestStatus.decision_metrics?.domain_p90_6h ?? "n/a"}<br>
+          domain_mean_6h: ${latestStatus.decision_metrics?.domain_mean_6h ?? "n/a"}
+        </div>
+      </div>
+    ` : ""}
 
     <div class="detail-block">
       <div class="detail-label">Available flood scenarios</div>
@@ -227,10 +270,12 @@ async function loadSite(site, options = {}) {
   currentSite = site;
 
   const scenarioKeys = Object.keys(scenarioData.scenarios);
-  const defaultScenario = site.default_scenario;
 
-  const initialScenarioKey = scenarioKeys.includes(defaultScenario)
-    ? defaultScenario
+  const latestStatus = latestStatusBySiteId[site.id];
+  const preferredScenario = latestStatus?.selected_scenario || site.default_scenario;
+
+  const initialScenarioKey = scenarioKeys.includes(preferredScenario)
+    ? preferredScenario
     : scenarioKeys[0];
 
   updateScenario(initialScenarioKey);
@@ -245,8 +290,13 @@ async function init() {
   const panel = document.getElementById('panel');
 
   try {
-    const sitesJson = await fetchJson('./api/sites.json');
+    const [sitesJson, latestJson] = await Promise.all([
+      fetchJson('./api/sites.json'),
+      fetchJson('./api/latest.json').catch(() => ({ sites: [] }))
+]);
+
     sitesData = sitesJson.sites || [];
+    buildLatestStatusIndex(latestJson);
 
     if (sitesData.length === 0) {
       panel.innerHTML = '<div class="placeholder">No sites found in sites.json.</div>';
