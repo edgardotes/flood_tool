@@ -5,7 +5,7 @@
       "label": "Green",
       "alert_level": "green",
       "message": "No flooding expected.",
-      "image": "./scenarios/gordevio/green.png"
+      "image": null
     },
     "yellow": {
       "label": "Yellow",

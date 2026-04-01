@@ -222,11 +222,21 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
 
     <div class="detail-block">
       <div class="detail-label">Hazard map preview</div>
-      <img
-        class="hazard-image"
-        src="${escapeHtml(scenarioConfig.image)}"
-        alt="Hazard scenario ${escapeHtml(scenarioConfig.label)} for ${escapeHtml(site.name)}"
-      >
+      ${
+        scenarioConfig.image
+          ? `
+            <img
+              class="hazard-image"
+              src="${escapeHtml(scenarioConfig.image)}"
+              alt="Hazard scenario ${escapeHtml(scenarioConfig.label)} for ${escapeHtml(site.name)}"
+            >
+          `
+          : `
+            <div class="no-hazard-box">
+              No hazard map is shown for the green scenario because no flooding is expected.
+            </div>
+          `
+      }
     </div>
 
     ${renderLegend()}

@@ -5,7 +5,7 @@
       "label": "Green",
       "alert_level": "green",
       "message": "No flooding expected.",
-      "image": "./scenarios/morges/green.png"
+      "image": null
     },
     "yellow": {
       "label": "Yellow",

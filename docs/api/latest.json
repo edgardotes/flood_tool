@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-04-01T16:14:48.577620+00:00",
+  "updated_utc": "2026-04-01T17:56:29.795948+00:00",
   "source": "ICON MeteoSwiss",
   "sites": [
     {
@@ -16,6 +16,36 @@
         "domain_mean_6h": 23.115446090698242
       },
       "hazard_image": "./scenarios/morges/red.png"
+    },
+    {
+      "id": "interlaken",
+      "name": "Camping Manor Farm",
+      "canton": "BE",
+      "lat": 46.705,
+      "lon": 7.889,
+      "selected_scenario": "green",
+      "alert_level": "green",
+      "message": "No flooding expected.",
+      "decision_metrics": {
+        "domain_p90_6h": 9.78372573852539,
+        "domain_mean_6h": 7.519042491912842
+      },
+      "hazard_image": null
+    },
+    {
+      "id": "gordevio",
+      "name": "Camping Gordevio",
+      "canton": "TI",
+      "lat": 46.224,
+      "lon": 8.749,
+      "selected_scenario": "green",
+      "alert_level": "green",
+      "message": "No flooding expected.",
+      "decision_metrics": {
+        "domain_p90_6h": 1.1697537899017334,
+        "domain_mean_6h": 0.3985385000705719
+      },
+      "hazard_image": null
     }
   ]
 }
