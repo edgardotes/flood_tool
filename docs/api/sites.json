@@ -26,15 +26,6 @@
       "lon": 7.869200013,
       "default_scenario": "red",
       "default_alert_level": "red"
-    },
-    {
-      "id": "zell",
-      "name": "Zell",
-      "canton": "ZH",
-      "lat": 47.447903436,
-      "lon": 8.823286228,
-      "default_scenario": "red",
-      "default_alert_level": "red"
     }
   ]
 }
