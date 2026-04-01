@@ -175,6 +175,66 @@ body {
   line-height: 1.5;
 }
 
+.view-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.view-btn {
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.15s ease-in-out;
+}
+
+.view-btn:hover {
+  transform: translateY(-1px);
+}
+
+.view-btn.active {
+  background: var(--button-active);
+  color: var(--button-active-text);
+  border-color: var(--button-active);
+}
+
+.no-content-box {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.impact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 0.94rem;
+}
+
+.impact-table th,
+.impact-table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.impact-table th {
+  background: #f8fafc;
+}
+
+.impact-table td.metric-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .legend-box {
   margin-top: 18px;
   padding-top: 14px;

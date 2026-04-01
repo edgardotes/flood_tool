@@ -5,25 +5,53 @@
       "label": "Green",
       "alert_level": "green",
       "message": "No flooding expected.",
-      "image": null
+      "hazard_image": null,
+      "impact_image": null,
+      "impact_metrics": {
+        "L1_mobile": {"count": 0, "percent": 0.0},
+        "L2_mobile": {"count": 0, "percent": 0.0},
+        "L1_non_mobile": {"count": 0, "percent": 0.0},
+        "L2_non_mobile": {"count": 0, "percent": 0.0}
+      }
     },
     "yellow": {
       "label": "Yellow",
       "alert_level": "yellow",
       "message": "Water may pond in low-lying sectors near the campsite.",
-      "image": "./scenarios/gordevio/yellow.png"
+      "hazard_image": "./scenarios/gordevio/yellow_hazard.png",
+      "impact_image": "./scenarios/gordevio/yellow_impact.png",
+      "impact_metrics": {
+        "L1_mobile": {"count": 1, "percent": 0.34},
+        "L2_mobile": {"count": 0, "percent": 0.0},
+        "L1_non_mobile": {"count": 0, "percent": 0.0},
+        "L2_non_mobile": {"count": 0, "percent": 0.0}
+      }
     },
     "orange": {
       "label": "Orange",
       "alert_level": "orange",
       "message": "Moderate flooding may affect internal access roads.",
-      "image": "./scenarios/gordevio/orange.png"
+      "hazard_image": "./scenarios/gordevio/orange_hazard.png",
+      "impact_image": "./scenarios/gordevio/orange_impact.png",
+      "impact_metrics": {
+        "L1_mobile": {"count": 24, "percent": 8.25},
+        "L2_mobile": {"count": 0, "percent": 0.0},
+        "L1_non_mobile": {"count": 1, "percent": 0.34},
+        "L2_non_mobile": {"count": 0, "percent": 0.0}
+      }
     },
     "red": {
       "label": "Red",
       "alert_level": "red",
       "message": "Severe flooding may affect important parts of the campsite.",
-      "image": "./scenarios/gordevio/red.png"
+      "hazard_image": "./scenarios/gordevio/red_hazard.png",
+      "impact_image": "./scenarios/gordevio/red_impact.png",
+      "impact_metrics": {
+        "L1_mobile": {"count": 33, "percent": 11.34},
+        "L2_mobile": {"count": 14, "percent": 4.81},
+        "L1_non_mobile": {"count": 1, "percent": 0.34},
+        "L2_non_mobile": {"count": 0, "percent": 0.0}
+      }
     }
   }
 }

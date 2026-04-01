@@ -18,6 +18,7 @@ let sitesData = [];
 let currentSite = null;
 let currentScenarioKey = null;
 let currentScenarioConfig = null;
+let currentViewMode = 'hazard';
 const markersBySiteId = {};
 
 function buildLatestStatusIndex(latestJson) {
@@ -29,11 +30,6 @@ function buildLatestStatusIndex(latestJson) {
     latestJson.sites.forEach(siteStatus => {
       latestStatusBySiteId[siteStatus.id] = siteStatus;
     });
-    return;
-  }
-
-  if (latestJson.site && latestJson.site.id) {
-    latestStatusBySiteId[latestJson.site.id] = latestJson.site;
   }
 }
 
@@ -117,7 +113,6 @@ function focusSiteOnMap(site, openPopup = false) {
   }
 }
 
-
 function createMarker(site) {
   const latestStatus = latestStatusBySiteId[site.id];
   const markerLevel = latestStatus?.alert_level || site.default_alert_level || 'green';
@@ -131,11 +126,12 @@ function createMarker(site) {
     weight: 2
   });
 
- marker.bindPopup(`
-  <strong>${escapeHtml(site.name)}</strong><br>
-  Canton: ${escapeHtml(site.canton)}<br>
-  Alert: ${escapeHtml(markerLevel.toUpperCase())}
-`);
+  marker.bindPopup(`
+    <strong>${escapeHtml(site.name)}</strong><br>
+    Canton: ${escapeHtml(site.canton)}<br>
+    Alert: ${escapeHtml(String(markerLevel).toUpperCase())}<br>
+    Scenario: ${escapeHtml(String(popupScenario).toUpperCase())}
+  `);
 
   marker.on('click', async () => {
     await loadSite(site, { recenterMap: false, openPopup: false });
@@ -144,6 +140,94 @@ function createMarker(site) {
 
   markersBySiteId[site.id] = marker;
   return marker;
+}
+
+function renderImpactTable(impactMetrics) {
+  if (!impactMetrics || typeof impactMetrics !== 'object') {
+    return `
+      <div class="no-content-box">
+        No impact metrics are available for this scenario.
+      </div>
+    `;
+  }
+
+  const rows = Object.entries(impactMetrics).map(([key, value]) => {
+    const count = value?.count ?? 'n/a';
+    const percent = value?.percent ?? 'n/a';
+    return `
+      <tr>
+        <td>${escapeHtml(key)}</td>
+        <td class="metric-num">${escapeHtml(String(count))}</td>
+        <td class="metric-num">${escapeHtml(String(percent))}</td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>Pitch type</th>
+          <th>Count</th>
+          <th>Percent (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderContentBlock(site, scenarioConfig) {
+  const hazardImage = scenarioConfig.hazard_image ?? null;
+  const impactImage = scenarioConfig.impact_image ?? null;
+  const impactMetrics = scenarioConfig.impact_metrics ?? null;
+
+  if (currentViewMode === 'hazard') {
+    return `
+      <div class="detail-block">
+        <div class="detail-label">Hazard map preview</div>
+        ${
+          hazardImage
+            ? `
+              <img
+                class="hazard-image"
+                src="${escapeHtml(hazardImage)}"
+                alt="Hazard scenario ${escapeHtml(scenarioConfig.label)} for ${escapeHtml(site.name)}"
+              >
+            `
+            : `
+              <div class="no-content-box">
+                No hazard map is shown for this scenario because no flooding is expected.
+              </div>
+            `
+        }
+      </div>
+    `;
+  }
+
+  return `
+    <div class="detail-block">
+      <div class="detail-label">Impact metrics</div>
+      ${
+        impactImage
+          ? `
+            <img
+              class="hazard-image"
+              src="${escapeHtml(impactImage)}"
+              alt="Impact metrics for scenario ${escapeHtml(scenarioConfig.label)} at ${escapeHtml(site.name)}"
+            >
+          `
+          : `
+            <div class="no-content-box">
+              No impact plot is shown for this scenario because no impacts are expected.
+            </div>
+          `
+      }
+      ${renderImpactTable(impactMetrics)}
+    </div>
+  `;
 }
 
 function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
@@ -164,10 +248,19 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
     `;
   }).join('');
 
+  const viewButtonsHtml = `
+    <button class="view-btn ${currentViewMode === 'hazard' ? 'active' : ''}" data-view-mode="hazard" type="button">
+      Hazard map preview
+    </button>
+    <button class="view-btn ${currentViewMode === 'impact' ? 'active' : ''}" data-view-mode="impact" type="button">
+      Impact metrics
+    </button>
+  `;
+
   panel.innerHTML = `
-   <div class="${badgeClass((latestStatus?.alert_level) || scenarioConfig.alert_level)}">
-     ${escapeHtml((latestStatus?.alert_level) || scenarioConfig.alert_level)}
-   </div>
+    <div class="${badgeClass((latestStatus?.alert_level) || scenarioConfig.alert_level)}">
+      ${escapeHtml((latestStatus?.alert_level) || scenarioConfig.alert_level)}
+    </div>
 
     <div class="detail-block">
       <div class="detail-label">Camping site</div>
@@ -202,7 +295,7 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
 
       <div class="detail-block">
         <div class="detail-label">Selected scenario from forecast</div>
-        <div class="detail-value">${escapeHtml(latestStatus.selected_scenario)}</div>
+        <div class="detail-value">${escapeHtml(String(latestStatus.selected_scenario).toUpperCase())}</div>
       </div>
 
       <div class="detail-block">
@@ -222,23 +315,13 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
     </div>
 
     <div class="detail-block">
-      <div class="detail-label">Hazard map preview</div>
-      ${
-        scenarioConfig.image
-          ? `
-            <img
-              class="hazard-image"
-              src="${escapeHtml(scenarioConfig.image)}"
-              alt="Hazard scenario ${escapeHtml(scenarioConfig.label)} for ${escapeHtml(site.name)}"
-            >
-          `
-          : `
-            <div class="no-hazard-box">
-              No hazard map is shown for the green scenario because no flooding is expected.
-            </div>
-          `
-      }
+      <div class="detail-label">Available views</div>
+      <div class="view-toggle">
+        ${viewButtonsHtml}
+      </div>
     </div>
+
+    ${renderContentBlock(site, scenarioConfig)}
 
     ${renderLegend()}
   `;
@@ -247,6 +330,20 @@ function renderPanel(site, scenarioKey, scenarioConfig, availableScenarioKeys) {
     button.addEventListener('click', () => {
       const selectedKey = button.dataset.scenarioKey;
       updateScenario(selectedKey);
+    });
+  });
+
+  panel.querySelectorAll('.view-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const selectedView = button.dataset.viewMode;
+      if (!selectedView) return;
+      currentViewMode = selectedView;
+      renderPanel(
+        currentSite,
+        currentScenarioKey,
+        currentScenarioConfig,
+        Object.keys(currentSite.scenarioData.scenarios)
+      );
     });
   });
 }
@@ -281,7 +378,6 @@ async function loadSite(site, options = {}) {
   currentSite = site;
 
   const scenarioKeys = Object.keys(scenarioData.scenarios);
-
   const latestStatus = latestStatusBySiteId[site.id];
   const preferredScenario = latestStatus?.selected_scenario || site.default_scenario;
 
@@ -289,6 +385,7 @@ async function loadSite(site, options = {}) {
     ? preferredScenario
     : scenarioKeys[0];
 
+  currentViewMode = 'hazard';
   updateScenario(initialScenarioKey);
   syncDropdown(site.id);
 
@@ -304,7 +401,7 @@ async function init() {
     const [sitesJson, latestJson] = await Promise.all([
       fetchJson('./api/sites.json'),
       fetchJson('./api/latest.json').catch(() => ({ sites: [] }))
-]);
+    ]);
 
     sitesData = sitesJson.sites || [];
     buildLatestStatusIndex(latestJson);
