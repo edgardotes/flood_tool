@@ -117,9 +117,11 @@ function focusSiteOnMap(site, openPopup = false) {
   }
 }
 
+
 function createMarker(site) {
   const latestStatus = latestStatusBySiteId[site.id];
   const markerLevel = latestStatus?.alert_level || site.default_alert_level || 'green';
+  const popupScenario = latestStatus?.selected_scenario || site.default_scenario || 'n/a';
 
   const marker = L.circleMarker([site.lat, site.lon], {
     radius: 9,
@@ -129,12 +131,11 @@ function createMarker(site) {
     weight: 2
   });
 
-  marker.bindPopup(`
-    <strong>${escapeHtml(site.name)}</strong><br>
-    Canton: ${escapeHtml(site.canton)}<br>
-    Alert: ${escapeHtml(markerLevel.toUpperCase())}<br>
-    Default scenario: ${escapeHtml(site.default_scenario)}
-  `);
+ marker.bindPopup(`
+  <strong>${escapeHtml(site.name)}</strong><br>
+  Canton: ${escapeHtml(site.canton)}<br>
+  Alert: ${escapeHtml(markerLevel.toUpperCase())}
+`);
 
   marker.on('click', async () => {
     await loadSite(site, { recenterMap: false, openPopup: false });
