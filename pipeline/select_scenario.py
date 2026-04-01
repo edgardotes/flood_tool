@@ -7,12 +7,12 @@ from __future__ import annotations
 # ------------------------------------------------------------------
 MORGES_THRESHOLDS = {
     "yellow": {
-        "domain_p90_6h": 10.0,
-        "domain_mean_6h": 4.0,
+        "domain_p90_6h": 15.0,
+        "domain_mean_6h": 10.0,
     },
     "orange": {
-        "domain_p90_6h": 20.0,
-        "domain_mean_6h": 8.0,
+        "domain_p90_6h": 25.0,
+        "domain_mean_6h": 20.0,
     },
     "red": {
         "domain_p90_6h": 35.0,
