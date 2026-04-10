@@ -96,4 +96,4 @@ Major contributions to date:
 
 - Edgar Dolores-Tesillos  
 - Gabriela Espejo  
-- OpenAI  
+- AI-assisted development 
