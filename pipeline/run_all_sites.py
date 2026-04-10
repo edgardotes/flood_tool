@@ -1,3 +1,22 @@
+"""
+Flood Tool – Scenario Selection Module
+
+Description:
+    Selects the most appropriate flood scenario based on thresholds and inputs.
+
+Authors:
+    Edgar Dolores-Tesillos
+
+Contributors:
+    ChatGPT (assistance)
+
+Created:
+    2026
+
+License:
+    MIT License
+"""
+
 from evaluate_sites import compute_dem_domain_metrics
 from select_scenario import select_scenario
 from sites_config import SITES

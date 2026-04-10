@@ -1,3 +1,22 @@
+"""
+Flood Tool – Evalute Module
+
+Description:
+    Selects the most appropriate flood scenario based on thresholds and inputs.
+
+Authors:
+    Edgar Dolores-Tesillos
+
+Contributors:
+    ChatGPT (assistance)
+
+Created:
+    2026
+
+License:
+    MIT License 
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
